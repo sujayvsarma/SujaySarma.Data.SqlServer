@@ -134,8 +134,9 @@ namespace SujaySarma.Data.SqlServer.Reflection
         /// <param name="clrValue">Value from the CLR object</param>
         /// <param name="enumSerializationBehaviour">If value is an enum, then how is it serialized</param>
         /// <param name="serializeToJson">If set, serializes complex types to Json</param>
+        /// <param name="quotedStrings">When true, returns strings in quoted form</param>
         /// <returns>Correctly quoted and formatted value to be used in a SQL statement</returns>
-        public static string GetSQLStringValue(object? clrValue, EnumSerializationBehaviourEnum enumSerializationBehaviour = EnumSerializationBehaviourEnum.AsInt, bool serializeToJson = false)
+        public static string GetSQLStringValue(object? clrValue, EnumSerializationBehaviourEnum enumSerializationBehaviour = EnumSerializationBehaviourEnum.AsInt, bool serializeToJson = false, bool quotedStrings = true)
         {
             if ((clrValue == null) || (clrValue == default))
             {
@@ -172,40 +173,40 @@ namespace SujaySarma.Data.SqlServer.Reflection
                     return $"{clrValue}";
 
                 case TypeCode.Char:
-                    return $"'{clrValue}'";
+                    return (quotedStrings ? $"'{clrValue}'" : $"{clrValue}");
 
                 case TypeCode.String:
                     string s = (string)clrValue;
                     s = s.Replace("'", "''");
-                    return $"'{s}'";
+                    return (quotedStrings ? $"'{s}'" : $"{s}");
 
                 case TypeCode.DateTime:
-                    return $"'{((DateTime)clrValue).ToUniversalTime():yyyy-MM-ddTHH:mm:ss}Z'";
+                    return (quotedStrings ? $"'{((DateTime)clrValue).ToUniversalTime():yyyy-MM-ddTHH:mm:ss}Z'" : $"{((DateTime)clrValue).ToUniversalTime():yyyy-MM-ddTHH:mm:ss}Z");
             }
 
             if (clrValue is DateOnly v1)
             {
-                return $"'{v1:yyyy-MM-dd}T00:00:00Z'";
+                return (quotedStrings ? $"'{v1:yyyy-MM-dd}T00:00:00Z'" : $"{v1:yyyy-MM-dd}T00:00:00Z");
             }
 
             if (clrValue is TimeOnly v2)
             {
-                return $"'01-01-{DateTime.UtcNow.Year}T{v2:HH:mm:ss}Z'";
+                return (quotedStrings ? $"'01-01-{DateTime.UtcNow.Year}T{v2:HH:mm:ss}Z'" : $"01-01-{DateTime.UtcNow.Year}T{v2:HH:mm:ss}Z");
             }
 
             if (clrValue is DateTimeOffset v3)
             {
-                return $"'{v3.UtcDateTime:yyyy-MM-ddTHH:mm:ss}Z'";
+                return (quotedStrings ? $"'{v3.UtcDateTime:yyyy-MM-ddTHH:mm:ss}Z'" : $"{v3.UtcDateTime:yyyy-MM-ddTHH:mm:ss}Z");
             }
 
             if (clrValue is Guid v4)
             {
-                return $"'{v4:d}'";
+                return (quotedStrings ? $"'{v4:d}'" : $"{v4:d}");
             }
 
             if (serializeToJson)
             {
-                return $"'{JsonSerializer.Serialize(clrValue).Replace("'", "''")}'";
+                return (quotedStrings ? $"'{JsonSerializer.Serialize(clrValue).Replace("'", "''")}'" : $"{JsonSerializer.Serialize(clrValue)}");
             }
 
             throw new ArgumentException($"Cannot serialize clrValue of type '{t.Name}'.");
@@ -331,7 +332,7 @@ namespace SujaySarma.Data.SqlServer.Reflection
             TypeMetadata metadata = TypeMetadata.Discover<TObject>();
             TObject instance = Activator.CreateInstance<TObject>();
 
-            foreach(MemberInfo member in metadata.Members)
+            foreach (MemberInfo member in metadata.Members)
             {
                 TableColumnAttribute? columnAttribute = member.GetCustomAttribute<TableColumnAttribute>();
                 if ((columnAttribute != null) && (row.Table.Columns.Contains(columnAttribute.ColumnName)))
@@ -348,7 +349,7 @@ namespace SujaySarma.Data.SqlServer.Reflection
                     }
 
                     SetValue(instance, member, value);
-                }                
+                }
             }
 
             return instance;

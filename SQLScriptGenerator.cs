@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Reflection;
 
+using Microsoft.Data.SqlClient;
+
 using SujaySarma.Data.SqlServer.Attributes;
 using SujaySarma.Data.SqlServer.Reflection;
 
@@ -64,6 +66,71 @@ namespace SujaySarma.Data.SqlServer
                         ((whereClause.Count > 0) ? string.Join(' ', "WHERE (", string.Join(" AND ", whereClause), ")") : ""),
                         ((sortClause.Count > 0) ? string.Join(' ', "ORDER BY", string.Join(',', sortClause)) : "")
                 );
+        }
+
+        /// <summary>
+        /// Generate SELECT statement - Can generate only simple (without JOINs etc) SELECT statements. If no parameters are provided, selects all rows as per 
+        /// the database-driven sorting order.
+        /// </summary>
+        /// <typeparam name="TObject">Type of object</typeparam>
+        /// <param name="parameters">The parameters for the WHERE clause. Key must be the TABLE COLUMN name and NOT the property name!</param>
+        /// <param name="sorting">Sorting for columns. Key must be the TABLE COLUMN name and NOT the property name!</param>
+        /// <param name="rowCount">Number of rows (TOP ??) to select. Zero or NULL for all rows.</param>
+        /// <returns>SqlCommand with the parameterized statement</returns>
+        public static SqlCommand GetSqlCommandForSelect<TObject>(IDictionary<string, object?>? parameters = null, IDictionary<string, SortOrderEnum>? sorting = null, int? rowCount = null)
+            where TObject : class
+        {
+            List<string> columnNames = new(), whereClause = new(), sortClause = new();
+            TypeMetadata metadata = TypeMetadata.Discover<TObject>();
+            foreach (MemberInfo member in metadata.Members)
+            {
+                TableColumnAttribute? columnAttribute = member.GetCustomAttribute<TableColumnAttribute>(true);
+                if ((columnAttribute == null) || (columnAttribute.InsertUpdateColumnBehaviour == InsertUpdateColumnBehaviourEnum.NeitherInsertNorUpdate))
+                {
+                    continue;
+                }
+
+                columnNames.Add($"[{columnAttribute.ColumnName}]");
+            }
+
+            if ((parameters != null) && (parameters != default) && (parameters != default(IDictionary<string, object?>)) && (parameters.Count > 0))
+            {
+                foreach (string colName in parameters.Keys)
+                {
+                    whereClause.Add($"([{colName}] = @param{colName})");
+                }
+            }
+
+            if ((sorting != null) && (sorting != default) && (sorting != default(IDictionary<string, SortOrderEnum?>)) && (sorting.Count > 0))
+            {
+                foreach (string colName in sorting.Keys)
+                {
+                    sortClause.Add($"[{colName}] {sorting[colName]}");
+                }
+            }
+
+            string query = string.Join(
+                    ' ',
+                        "SELECT",
+                        (((rowCount == null) || (rowCount == default) || (rowCount == default(int)) || (rowCount < 1)) ? "" : $"TOP {rowCount}"),
+                        string.Join(',', columnNames),
+                        "FROM",
+                        $"[{metadata.TableName}]",
+                        "WITH (NOLOCK)",
+                        ((whereClause.Count > 0) ? string.Join(' ', "WHERE (", string.Join(" AND ", whereClause), ")") : ""),
+                        ((sortClause.Count > 0) ? string.Join(' ', "ORDER BY", string.Join(',', sortClause)) : "")
+                );
+
+            SqlCommand cmd = new(query);
+            if ((parameters != null) && (parameters != default) && (parameters != default(IDictionary<string, object?>)) && (parameters.Count > 0))
+            {
+                foreach (string colName in parameters.Keys)
+                {
+                    cmd.Parameters.AddWithValue($"@param{colName}", parameters[colName]);
+                }
+            }
+
+            return cmd;
         }
 
 

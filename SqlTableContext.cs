@@ -27,7 +27,7 @@ namespace SujaySarma.Data.SqlServer
         /// <returns>Enumeration of object instances</returns>
         public IEnumerable<T> Select<T>(IDictionary<string, object?> parameters, IDictionary<string, SortOrderEnum>? sorting = null, int? rowCount = null)
             where T : class
-            => Select<T>(SQLScriptGenerator.GetSelectStatement<T>(parameters, sorting, rowCount));
+            => Select<T>(SQLScriptGenerator.GetSqlCommandForSelect<T>(parameters, sorting, rowCount));
 
         /// <summary>
         /// Executes a SELECT and returns a single result or NULL (if none found)
@@ -39,7 +39,7 @@ namespace SujaySarma.Data.SqlServer
         public T? SelectOnlyResultOrNull<T>(IDictionary<string, object?> parameters, IDictionary<string, SortOrderEnum>? sorting = null)
             where T : class
         {
-            IEnumerable<T> items = Select<T>(SQLScriptGenerator.GetSelectStatement<T>(parameters, sorting, 1));
+            IEnumerable<T> items = Select<T>(SQLScriptGenerator.GetSqlCommandForSelect<T>(parameters, sorting, 1));
             if (items.Any())
             {
                 return items.First();
@@ -75,6 +75,16 @@ namespace SujaySarma.Data.SqlServer
         /// <returns>Enumeration of object instances</returns>
         public IEnumerable<T> Select<T>(string query) where T : class
             => ExecuteQuery<T>(query);
+
+        /// <summary>
+        /// Executes a SELECT
+        /// </summary>
+        /// <typeparam name="T">Type of object</typeparam>
+        /// <param name="query">Query to run on the SQL Server</param>
+        /// <returns>Enumeration of object instances</returns>
+        public IEnumerable<T> Select<T>(SqlCommand query) where T : class
+            => ExecuteQuery<T>(query);
+
 
         /// <summary>
         /// Execute an INSERT
@@ -323,7 +333,42 @@ namespace SujaySarma.Data.SqlServer
                     yield return ReflectionUtils.Populate<T>(row);
                 }
             }
-        }        
+        }
+
+        /// <summary>
+        /// Execute a query yielding an enumeration of object instances
+        /// </summary>
+        /// <typeparam name="T">Type of object</typeparam>
+        /// <param name="query">Query to run on the SQL Server</param>
+        /// <returns>Enumeration of object instances</returns>
+        public IEnumerable<T> ExecuteQuery<T>(SqlCommand query)
+            where T : class
+        {
+            DataTable table = new();
+            using (SqlConnection cn = new(_connectionString))
+            {
+                cn.Open();
+                query.Connection = cn;
+
+#if DEBUG
+                if (Environment.GetEnvironmentVariable("SQLTABLECONTEXT_DUMPSQL") != null)
+                {
+                    Console.WriteLine(query.CommandText);
+                }
+#endif
+
+                using SqlDataAdapter da = new(query);
+                da.Fill(table);
+            }
+
+            if ((table.Columns.Count > 0) && (table.Rows.Count > 0))
+            {
+                foreach (DataRow row in table.Rows)
+                {
+                    yield return ReflectionUtils.Populate<T>(row);
+                }
+            }
+        }
 
 
         /// <summary>
