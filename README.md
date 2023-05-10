@@ -7,6 +7,8 @@ Library                      | Current version
 -----------------------------|------------------
 SujaySarma.Data.SqlServer    | Version 8.5.0
 
+## NuGet Package
+https://www.nuget.org/packages/SujaySarma.Data.SqlServer
 
 ### Changelog
 
