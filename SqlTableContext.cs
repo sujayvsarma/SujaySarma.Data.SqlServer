@@ -545,14 +545,20 @@ namespace SujaySarma.Data.SqlServer
                 }
 #endif
 
+#pragma warning disable IDE0034
                 object? v = await cmd.ExecuteScalarAsync();
-                return (T?)(((v is DBNull) || (v == DBNull.Value)) ? default(T) : v);     // return CLR null instead of DBNull
+                if ((v is DBNull) || (v == DBNull.Value))
+                {
+                    return default(T);
+                }
+
+                return (T?)ReflectionUtils.CoerceFromEdmValue(v, typeof(T));
             }
             catch
             {
             }
 
-#pragma warning disable IDE0034
+
             return default(T);
 #pragma warning restore IDE0034
         }
