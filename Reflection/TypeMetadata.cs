@@ -52,6 +52,8 @@ namespace SujaySarma.Data.SqlServer.Reflection
         public static TypeMetadata Discover(Type TObject)
         {
             Type classType = TObject;
+            string cacheKeyName = classType.FullName ?? classType.Name;
+
             TableAttribute? tableAttribute = classType.GetCustomAttribute<TableAttribute>(true);
             if ((tableAttribute == default) || string.IsNullOrWhiteSpace(tableAttribute.TableName))
             {
