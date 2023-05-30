@@ -33,6 +33,9 @@
 		<PackageIcon>logo.png</PackageIcon>
 		<IncludeSymbols>False</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageProjectUrl>https://github.com/sujayvsarma/SujaySarma.Data.SqlServer</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/sujayvsarma/SujaySarma.Data.SqlServer</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -44,7 +47,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.0" />
+		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0-preview1.23109.1" />
 	</ItemGroup>
 
 	<ItemGroup>
