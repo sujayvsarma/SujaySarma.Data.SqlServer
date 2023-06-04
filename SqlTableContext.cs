@@ -547,7 +547,7 @@ namespace SujaySarma.Data.SqlServer
 
 #pragma warning disable IDE0034
                 object? v = await cmd.ExecuteScalarAsync();
-                if ((v is DBNull) || (v == DBNull.Value))
+                if ((v == null) || (v is DBNull) || (v == DBNull.Value))
                 {
                     return default(T);
                 }
