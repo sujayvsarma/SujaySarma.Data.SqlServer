@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Microsoft.Data.SqlClient;
-
 using SujaySarma.Data.SqlServer.Reflection;
 
 namespace SujaySarma.Data.SqlServer
@@ -25,9 +24,22 @@ namespace SujaySarma.Data.SqlServer
         /// <param name="sorting">Sorting for columns. Key must be the TABLE COLUMN name and NOT the property name!</param>
         /// <param name="rowCount">Number of rows (TOP ??) to select. Zero or NULL for all rows.</param>
         /// <returns>Enumeration of object instances</returns>
-        public IEnumerable<T> Select<T>(IDictionary<string, object?> parameters, IDictionary<string, SortOrderEnum>? sorting = null, int? rowCount = null)
+        public IEnumerable<T> Select<T>(IDictionary<string, object?>? parameters = null, IDictionary<string, SortOrderEnum>? sorting = null, int? rowCount = null)
             where T : class
             => Select<T>(SQLScriptGenerator.GetSqlCommandForSelect<T>(parameters, sorting, rowCount));
+
+        /// <summary>
+        /// Executes a SELECT
+        /// </summary>
+        /// <typeparam name="T">Type of object</typeparam>
+        /// <param name="conditionBuilder">A fully composed SqlConditionBuilder instance to use for conditions in the WHERE clause</param>
+        /// <param name="sorting">Sorting for columns. Key must be the TABLE COLUMN name and NOT the property name!</param>
+        /// <param name="rowCount">Number of rows (TOP ??) to select. Zero or NULL for all rows.</param>
+        /// <returns>Enumeration of object instances</returns>
+        public IEnumerable<T> Select<T>(SqlConditionBuilder? conditionBuilder = null, IDictionary<string, SortOrderEnum>? sorting = null, int? rowCount = null)
+            where T : class
+            => Select<T>(SQLScriptGenerator.GetSqlCommandForSelect<T>(conditionBuilder, sorting, rowCount));
+
 
         /// <summary>
         /// Executes a SELECT and returns a single result or NULL (if none found)
@@ -36,17 +48,20 @@ namespace SujaySarma.Data.SqlServer
         /// <param name="parameters">The parameters for the WHERE clause. Key must be the TABLE COLUMN name and NOT the property name!</param>
         /// <param name="sorting">Sorting for columns. Key must be the TABLE COLUMN name and NOT the property name!</param>
         /// <returns>Enumeration of object instances</returns>
-        public T? SelectOnlyResultOrNull<T>(IDictionary<string, object?> parameters, IDictionary<string, SortOrderEnum>? sorting = null)
+        public T? SelectOnlyResultOrNull<T>(IDictionary<string, object?>? parameters = null, IDictionary<string, SortOrderEnum>? sorting = null)
             where T : class
-        {
-            IEnumerable<T> items = Select<T>(SQLScriptGenerator.GetSqlCommandForSelect<T>(parameters, sorting, 1));
-            if (items.Any())
-            {
-                return items.First();
-            }
+            => SelectOnlyResultOrNull<T>(SQLScriptGenerator.GetSelectStatement<T>(parameters, sorting, 1));
 
-            return null;
-        }
+        /// <summary>
+        /// Executes a SELECT and returns a single result or NULL (if none found)
+        /// </summary>
+        /// <typeparam name="T">Type of object</typeparam>
+        /// <param name="conditionBuilder">A fully composed SqlConditionBuilder instance to use for conditions in the WHERE clause</param>
+        /// <param name="sorting">Sorting for columns. Key must be the TABLE COLUMN name and NOT the property name!</param>
+        /// <returns>Enumeration of object instances</returns>
+        public T? SelectOnlyResultOrNull<T>(SqlConditionBuilder? conditionBuilder = null, IDictionary<string, SortOrderEnum>? sorting = null)
+            where T : class
+            => SelectOnlyResultOrNull<T>(SQLScriptGenerator.GetSelectStatement<T>(conditionBuilder?.ToString(), sorting, 1));
 
         /// <summary>
         /// Executes a SELECT and returns a single result or NULL (if none found)
