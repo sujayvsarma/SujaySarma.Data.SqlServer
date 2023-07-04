@@ -36,7 +36,7 @@ namespace SujaySarma.Data.SqlServer
                 }
             }
 
-            return string.Join(" AND ", whereClause);
+            return GetSelectStatement<TObject>(string.Join(" AND ", whereClause), sorting, rowCount);
         }
 
         /// <summary>
