@@ -60,7 +60,7 @@ namespace SujaySarma.Data.SqlServer.Fluid
         /// Register the table to delete from
         /// </summary>
         /// <returns>Created instance of SqlDeleteBuilder</returns>
-        public static SqlDeleteBuilder<TTable> FromTable()
+        public static SqlDeleteBuilder<TTable> Begin()
             => new();
 
 

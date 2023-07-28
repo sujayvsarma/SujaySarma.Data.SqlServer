@@ -97,7 +97,7 @@ namespace SujaySarma.Data.SqlServer
         /// <param name="insertBuilder">Instance of SqlInsertBuilder</param>
         /// <param name="tableContext">SqlTableContext to use to execute the query</param>
         /// <returns>Number of rows affected on the SQL Server</returns>
-        public static async Task<int> Execute<T>(this SqlInsertBuilder<T> insertBuilder, SqlTableContext tableContext)
+        public static async Task<int> ExecuteAsync<T>(this SqlInsertBuilder<T> insertBuilder, SqlTableContext tableContext)
             where T : class
             => await tableContext.ExecuteNonQueryAsync(insertBuilder.Build());
 
@@ -107,7 +107,7 @@ namespace SujaySarma.Data.SqlServer
         /// <param name="insertBuilder">Instance of SqlInsertFromQueryBuilder</param>
         /// <param name="tableContext">SqlTableContext to use to execute the query</param>
         /// <returns>Number of rows affected on the SQL Server</returns>
-        public static async Task<int> Execute(this SqlInsertFromQueryBuilder insertBuilder, SqlTableContext tableContext)
+        public static async Task<int> ExecuteAsync(this SqlInsertFromQueryBuilder insertBuilder, SqlTableContext tableContext)
             => await tableContext.ExecuteNonQueryAsync(insertBuilder.Build());
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace SujaySarma.Data.SqlServer
         /// <param name="updateBuilder">Instance of SqlUpdateBuilder</param>
         /// <param name="tableContext">SqlTableContext to use to execute the query</param>
         /// <returns>Number of rows affected on the SQL Server</returns>
-        public static async Task<int> Execute<T>(this SqlUpdateBuilder<T> updateBuilder, SqlTableContext tableContext)
+        public static async Task<int> ExecuteAsync<T>(this SqlUpdateBuilder<T> updateBuilder, SqlTableContext tableContext)
             where T : class
             => await tableContext.ExecuteNonQueryAsync(updateBuilder.Build());
 
@@ -127,7 +127,7 @@ namespace SujaySarma.Data.SqlServer
         /// <param name="updateBuilder">Instance of SqlUpdateWithJoinsBuilder</param>
         /// <param name="tableContext">SqlTableContext to use to execute the query</param>
         /// <returns>Number of rows affected on the SQL Server</returns>
-        public static async Task<int> Execute(this SqlUpdateWithJoinsBuilder updateBuilder, SqlTableContext tableContext)
+        public static async Task<int> ExecuteAsync(this SqlUpdateWithJoinsBuilder updateBuilder, SqlTableContext tableContext)
             => await tableContext.ExecuteNonQueryAsync(updateBuilder.Build());
 
         /// <summary>
@@ -137,7 +137,7 @@ namespace SujaySarma.Data.SqlServer
         /// <param name="deleteBuilder">Instance of SqlDeleteBuilder</param>
         /// <param name="tableContext">SqlTableContext to use to execute the query</param>
         /// <returns>Number of rows affected on the SQL Server</returns>
-        public static async Task<int> Execute<T>(this SqlDeleteBuilder<T> deleteBuilder, SqlTableContext tableContext)
+        public static async Task<int> ExecuteAsync<T>(this SqlDeleteBuilder<T> deleteBuilder, SqlTableContext tableContext)
             where T : class
             => await tableContext.ExecuteNonQueryAsync(deleteBuilder.Build());
 

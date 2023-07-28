@@ -86,11 +86,6 @@ namespace SujaySarma.Data.SqlServer.Fluid
             where TObject : class
         {
             base.TypeTableMap.TryAdd<TObject>();
-            if ((_selectColumnsList.Count > 0) && (_selectColumnsList[0] == "*"))
-            {
-                throw new InvalidOperationException("Column selection has already been set to '*' (all columns).");
-            }
-
             foreach (Expression selector in selectors)
             {
                 // we cannot check/skip because these may contain aliased columns ('foo+1 as foobar')

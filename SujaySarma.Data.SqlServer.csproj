@@ -49,6 +49,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="_docs\**" />
+	  <EmbeddedResource Remove="_docs\**" />
+	  <None Remove="_docs\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.0" />
 	</ItemGroup>
 
