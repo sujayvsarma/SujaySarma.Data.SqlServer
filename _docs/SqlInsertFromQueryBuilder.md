@@ -34,7 +34,7 @@ Now that the builder is complete, there are 3 ways of using it:
 All the builders have the method `Build` that returns the T-SQL as a string. Simply call `Build` at the end of the sequence to get this T-SQL and use it in your own SqlCommand.
 
 ```c#
-SqlCommand cmd = new(SqlInsertBuilder....Build());
+SqlCommand cmd = new(SqlInsertFromQueryBuilder....Build());
 ```
 
 **Method 2: Pass the builder as is to the SqlTableContext's Select method**
