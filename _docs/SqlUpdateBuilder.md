@@ -3,7 +3,7 @@
 This document details the use of the SqlUpdateBuilder statement builder introduced in version 8.8.0.
 
 ---
-This statement builder helps build the INSERT  statement. It supports inserting data from a single business object, or multiple business objects. The SqlUpdateBuilder also lets you specify arbitrary data to insert, and more. Let us first look at an example of using the builder. Assume that any objects and properties/fields referenced have been defined elsewhere.
+This statement builder helps build the UPDATE statement. It supports updating data from a single business object, or multiple business objects. The SqlUpdateBuilder also lets you specify arbitrary data to update, and more. Let us first look at an example of using the builder. Assume that any objects and properties/fields referenced have been defined elsewhere.
 
 ```c#
 SqlUpdateBuilder<UserAccounts>
@@ -18,7 +18,7 @@ SqlUpdateBuilder<UserAccounts>
 
 Let's now look at what we did in more detail:
 
-The builder is static in nature. So calling the `Begin()` method instantiates the builder and kicks off the building sequence. The table being inserted into is the one corresponding to the business object used as the `T` parameter for `SqlUpdateBuilder<T>`.
+The builder is static in nature. So calling the `Begin()` method instantiates the builder and kicks off the building sequence. The table being updated is the one corresponding to the business object used as the `T` parameter for `SqlUpdateBuilder<T>`.
 
 The call to `AddItems` accepts one or more instances of business objects. Above, we are only adding one item, but this can be a sequence of items in `param array` fashion or an `IEnumerable` structure containing them. We may add additional values to the table that are not a part of the business object using the `WithAdditionalColumns` function. This function accepts a `Dictionary<string, object?>`. Values provided to the `WithAdditionalColumns` are NOT re-interpreted, meaning what you have in your code will match exactly the values added to the corresponding `UPDATE` statement -- there will be no magic changing `Enums` to `strings` and so on, you will need to do them on your own.
 
