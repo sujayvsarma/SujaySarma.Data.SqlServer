@@ -58,5 +58,12 @@ namespace SujaySarma.Data.SqlServer.Attributes
             SchemaName = schemaName;
             TableName = tableName;
         }
+
+        /// <summary>
+        /// Returns the schema.table name of the table defined.
+        /// </summary>
+        /// <returns>String</returns>
+        public override string ToString()
+            => $"[{SchemaName}].[{TableName}]";
     }
 }

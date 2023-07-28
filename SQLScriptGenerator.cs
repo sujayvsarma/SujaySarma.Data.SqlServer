@@ -55,8 +55,8 @@ namespace SujaySarma.Data.SqlServer
             TypeMetadata metadata = TypeMetadata.Discover<TObject>();
             foreach (MemberInfo member in metadata.Members)
             {
-                TableColumnAttribute? columnAttribute = member.GetCustomAttribute<TableColumnAttribute>(true);
-                if ((columnAttribute == null) || (columnAttribute.InsertUpdateColumnBehaviour == InsertUpdateColumnBehaviourEnum.NeitherInsertNorUpdate))
+                TableColumnAttribute columnAttribute = member.GetCustomAttribute<TableColumnAttribute>(true)!;
+                if (columnAttribute.InsertUpdateColumnBehaviour == InsertUpdateColumnBehaviourEnum.NeitherInsertNorUpdate)
                 {
                     continue;
                 }
@@ -111,27 +111,13 @@ namespace SujaySarma.Data.SqlServer
         }
 
         /// <summary>
-        /// Generate SELECT statement - Can generate only simple (without JOINs etc) SELECT statements. If no parameters are provided, selects all rows as per 
-        /// the database-driven sorting order.
-        /// </summary>
-        /// <typeparam name="TObject">Type of object</typeparam>
-        /// <param name="conditionBuilder">Collection of conditions to use for the WHERE clause</param>
-        /// <param name="sorting">Sorting for columns. Key must be the TABLE COLUMN name and NOT the property name!</param>
-        /// <param name="rowCount">Number of rows (TOP ??) to select. Zero or NULL for all rows.</param>
-        /// <returns>SqlCommand with the parameterized statement</returns>
-        public static SqlCommand GetSqlCommandForSelect<TObject>(SqlConditionBuilder? conditionBuilder = null, IDictionary<string, SortOrderEnum>? sorting = null, int? rowCount = null)
-            where TObject : class
-            => new(GetSelectStatement<TObject>(conditionBuilder?.ToString(), sorting, rowCount));
-
-
-
-        /// <summary>
         /// Generate INSERT statement
         /// </summary>
         /// <typeparam name="TObject">Type of object</typeparam>
         /// <param name="instance">Instance of object</param>
+        /// <param name="AdditionalData">Additional data to be inserted</param>
         /// <returns>SQL INSERT string</returns>
-        public static string GetInsertStatement<TObject>(TObject instance)
+        public static string GetInsertStatement<TObject>(TObject instance, Dictionary<string, object?>? AdditionalData = null)
             where TObject : class
         {
             List<string> columnNames = new(), values = new();
@@ -139,8 +125,8 @@ namespace SujaySarma.Data.SqlServer
             TypeMetadata metadata = TypeMetadata.Discover<TObject>();
             foreach(MemberInfo member in metadata.Members)
             {
-                TableColumnAttribute? columnAttribute = member.GetCustomAttribute<TableColumnAttribute>(true);
-                if ((columnAttribute == null) || (columnAttribute.InsertUpdateColumnBehaviour == InsertUpdateColumnBehaviourEnum.NeitherInsertNorUpdate))
+                TableColumnAttribute columnAttribute = member.GetCustomAttribute<TableColumnAttribute>(true)!;
+                if (columnAttribute.InsertUpdateColumnBehaviour == InsertUpdateColumnBehaviourEnum.NeitherInsertNorUpdate)
                 {
                     continue;
                 }
@@ -153,6 +139,15 @@ namespace SujaySarma.Data.SqlServer
 
                 columnNames.Add($"[{columnAttribute.ColumnName}]");
                 values.Add(sqlValue);
+            }
+
+            if ((AdditionalData != null) && (AdditionalData.Count > 0))
+            {
+                foreach(string key in AdditionalData.Keys)
+                {
+                    columnNames.Add($"[{key}]");
+                    values.Add(ReflectionUtils.GetSQLStringValue(AdditionalData[key]));
+                }
             }
 
             return string.Join(
@@ -172,8 +167,10 @@ namespace SujaySarma.Data.SqlServer
         /// </summary>
         /// <typeparam name="TObject">Type of object</typeparam>
         /// <param name="instance">Instance of object</param>
+        /// <param name="AdditionalData">Additional data to be updated</param>
+        /// <param name="AdditionalConditions">Additional conditions to check -- will be merged with 'AND'</param>
         /// <returns>SQL UPDATE string</returns>
-        public static string GetUpdateStatement<TObject>(TObject instance)
+        public static string GetUpdateStatement<TObject>(TObject instance, Dictionary<string, object?>? AdditionalData = null, List<string>? AdditionalConditions = null)
             where TObject : class
         {
             TypeMetadata metadata = TypeMetadata.Discover<TObject>();
@@ -181,12 +178,7 @@ namespace SujaySarma.Data.SqlServer
 
             foreach (MemberInfo member in metadata.Members)
             {
-                TableColumnAttribute? columnAttribute = member.GetCustomAttribute<TableColumnAttribute>(true);
-                if (columnAttribute == null)
-                {
-                    continue;
-                }
-
+                TableColumnAttribute columnAttribute = member.GetCustomAttribute<TableColumnAttribute>(true)!;
                 string sqlValue = ReflectionUtils.GetSQLStringValue(
                         ReflectionUtils.GetValue<TObject>(instance, member),
                         columnAttribute.EnumSerializationBehaviour,
@@ -206,7 +198,23 @@ namespace SujaySarma.Data.SqlServer
                     case InsertUpdateColumnBehaviourEnum.InsertAndUpdate:
                         updateValues.Add($"[{columnAttribute.ColumnName}] = {sqlValue}");
                         break;
-                }                
+                }
+            }
+
+            if ((AdditionalData != null) && (AdditionalData.Count > 0))
+            {
+                foreach (string key in AdditionalData.Keys)
+                {
+                    updateValues.Add($"[{key}] = {ReflectionUtils.GetSQLStringValue(AdditionalData[key])}");
+                }
+            }
+
+            if ((AdditionalConditions != null) && (AdditionalConditions.Count > 0))
+            {
+                foreach (string item in AdditionalConditions)
+                {
+                    conditions.Add(item);
+                }
             }
 
             return string.Join(
@@ -235,8 +243,8 @@ namespace SujaySarma.Data.SqlServer
 
             foreach (MemberInfo member in metadata.Members)
             {
-                TableColumnAttribute? columnAttribute = member.GetCustomAttribute<TableColumnAttribute>(true);
-                if ((columnAttribute == null) || (columnAttribute.InsertUpdateColumnBehaviour == InsertUpdateColumnBehaviourEnum.NeitherInsertNorUpdate))
+                TableColumnAttribute columnAttribute = member.GetCustomAttribute<TableColumnAttribute>(true)!;
+                if (columnAttribute.InsertUpdateColumnBehaviour == InsertUpdateColumnBehaviourEnum.NeitherInsertNorUpdate)
                 {
                     continue;
                 }
@@ -295,8 +303,9 @@ namespace SujaySarma.Data.SqlServer
         /// </summary>
         /// <typeparam name="TObject">Type of object</typeparam>
         /// <param name="instance">Instance of object</param>
+        /// <param name="AdditionalConditions">Additional conditions to check -- will be merged with 'AND'</param>
         /// <returns>SQL DELETE string</returns>
-        public static string GetDeleteStatement<TObject>(TObject instance)
+        public static string GetDeleteStatement<TObject>(TObject instance, List<string>? AdditionalConditions = null)
             where TObject : class
         {
             TypeMetadata metadata = TypeMetadata.Discover<TObject>();
@@ -304,8 +313,8 @@ namespace SujaySarma.Data.SqlServer
 
             foreach (MemberInfo member in metadata.Members)
             {
-                TableColumnAttribute? columnAttribute = member.GetCustomAttribute<TableColumnAttribute>(true);
-                if ((columnAttribute == null) || (columnAttribute.KeyBehaviour != KeyBehaviourEnum.PrimaryKey))
+                TableColumnAttribute columnAttribute = member.GetCustomAttribute<TableColumnAttribute>(true)!;
+                if (columnAttribute.KeyBehaviour != KeyBehaviourEnum.PrimaryKey)
                 {
                     continue;
                 }
@@ -317,6 +326,14 @@ namespace SujaySarma.Data.SqlServer
                     );
 
                 conditions.Add($"([{columnAttribute.ColumnName}] = {sqlValue})");
+            }
+
+            if ((AdditionalConditions != null) && (AdditionalConditions.Count > 0))
+            {
+                foreach (string item in AdditionalConditions)
+                {
+                    conditions.Add(item);
+                }
             }
 
             if (metadata.UseSoftDelete)
