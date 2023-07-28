@@ -5,7 +5,7 @@
 
 Library                      | Current version
 -----------------------------|------------------
-SujaySarma.Data.SqlServer    | Version 8.7.5
+SujaySarma.Data.SqlServer    | Version 8.8.0
 
 ## NuGet Package
 https://www.nuget.org/packages/SujaySarma.Data.SqlServer
@@ -17,6 +17,7 @@ https://github.com/sujayvsarma/SujaySarma.Data.SqlServer
 
 Version | Changes
 --------|----------
+8.8.0 | Fluid builders, support for Lambda expressions
 8.7.5 | Nullability bug fix in `ExecuteScalarAsync()`.
 8.7.0 | SQL Injection mitigation for `Select()` methods.
 8.5.0 | Added `UpsertAsync()` and `SQLTABLECONTEXT_DUMPSQL` env variable support. 

@@ -3,7 +3,22 @@
 
 *This document captures all changes made to this library since it's initial release.*
 
-### Version 8.7.5 (Latest!)
+### Version 8.8.0 (Latest!)
+
+- Adds Lambda Expression support. Use this with the Fluid style statement builders.
+
+- New! In the namespace `SujaySarma.Data.SqlServer.Fluid`, find new statement builders:
+
+    - SqlQueryBuilder
+    - SqlInsertBuilder
+    - SqlInsertFromQueryBuilder
+    - SqlUpdateBuilder
+    - SqlUpdateWithJoinsBuilder
+    - SqlDeleteBuilder
+   
+    details of how to use these are in [this document](https://github.com/sujayvsarma/SujaySarma.Data.SqlServer/blob/master/FLUID.md).
+
+### Version 8.7.5
 
 - Fixes a bug that incorrectly evaluated `null` values in the `ExecuteScalarAsync()` method. This bug fix has no impact on code.
 
