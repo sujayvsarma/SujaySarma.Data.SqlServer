@@ -102,7 +102,7 @@ namespace SujaySarma.Data.SqlServer.Fluid.Tools
             _aliasMapCollection = aliasMapCollection;
         }
 
-        private TypeTableAliasMapCollection _aliasMapCollection;
-        private List<string> _joinStatements;
+        private readonly TypeTableAliasMapCollection _aliasMapCollection;
+        private readonly List<string> _joinStatements;
     }
 }

@@ -146,6 +146,6 @@ namespace SujaySarma.Data.SqlServer.Fluid
         }
 
         private Dictionary<string, object?>? _additionalColumnsWithValues;
-        private List<string> _columnMappings;
+        private readonly List<string> _columnMappings;
     }
 }

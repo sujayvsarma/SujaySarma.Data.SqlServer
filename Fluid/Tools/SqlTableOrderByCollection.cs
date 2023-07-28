@@ -66,7 +66,7 @@ namespace SujaySarma.Data.SqlServer.Fluid.Tools
             _orderBy = new();
         }
 
-        private TypeTableAliasMapCollection _aliasMapCollection;
-        private List<string> _orderBy;
+        private readonly TypeTableAliasMapCollection _aliasMapCollection;
+        private readonly List<string> _orderBy;
     }
 }

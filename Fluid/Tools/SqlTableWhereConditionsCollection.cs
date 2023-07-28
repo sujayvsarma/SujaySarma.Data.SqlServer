@@ -86,7 +86,7 @@ namespace SujaySarma.Data.SqlServer.Fluid.Tools
             _aliasMapCollection = aliasMapCollection;
         }
 
-        private TypeTableAliasMapCollection _aliasMapCollection;
-        private StringBuilder _whereConditions;
+        private readonly TypeTableAliasMapCollection _aliasMapCollection;
+        private readonly StringBuilder _whereConditions;
     }
 }
