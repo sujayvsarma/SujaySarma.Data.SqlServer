@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 using SujaySarma.Data.SqlServer.Attributes;
 
@@ -24,8 +23,9 @@ namespace SujaySarma.Data.SqlServer.Reflection
         /// <typeparam name="TObject">Type of object</typeparam>
         /// <param name="instance">Instance of object</param>
         /// <param name="member">Member property or field</param>
+        /// <param name="doNotAutoGen">If set, the AutoGenerateValue is ignored</param>
         /// <returns>Value of property or field or NULL</returns>
-        public static object? GetValue<TObject>(TObject instance, MemberInfo member)
+        public static object? GetValue<TObject>(TObject? instance, MemberInfo member, bool doNotAutoGen = false)
             where TObject : class
         {
             TableColumnAttribute? columnAttribute = member.GetCustomAttribute<TableColumnAttribute>(true);
@@ -33,8 +33,8 @@ namespace SujaySarma.Data.SqlServer.Reflection
 
             if (member is FieldInfo field)
             {
-                value = field.GetValue(instance);
-                if ((columnAttribute != null) && columnAttribute.AutoGenerateValue)
+                value = field.GetValue((field.IsStatic ? null : instance));
+                if ((!doNotAutoGen) && (columnAttribute != null) && columnAttribute.AutoGenerateValue)
                 {
                     if (field.FieldType == typeof(Guid))
                     {
@@ -54,11 +54,11 @@ namespace SujaySarma.Data.SqlServer.Reflection
                     }
                 }
             }
-
-            if (member is PropertyInfo property)
+            else if (member is PropertyInfo property)
             {
+                // properties are never 'static'
                 value = property.GetValue(instance);
-                if ((columnAttribute != null) && columnAttribute.AutoGenerateValue)
+                if ((!doNotAutoGen) && (columnAttribute != null) && columnAttribute.AutoGenerateValue)
                 {
                     if (property.PropertyType == typeof(Guid))
                     {
@@ -430,6 +430,36 @@ namespace SujaySarma.Data.SqlServer.Reflection
 
             return "nvarchar";  // when all else fails
         }
+
+        /// <summary>
+        /// Try and get the table and column name of the property/field
+        /// </summary>
+        /// <param name="memberInfo">Property or Field information</param>
+        /// <param name="tableName">[Out] Name of the table this column belongs in</param>
+        /// <param name="columnName">[Out] Name of the column corresponding to this <paramref name="memberInfo"/></param>
+        /// <returns>True if we retrieved the information.</returns>
+        public static bool TryGetTableAndColumnName(MemberInfo memberInfo, [NotNullWhen(true)] out string? tableName, [NotNullWhen(true)] out string? columnName)
+        {
+            bool result = false;
+            tableName = null;
+            columnName = null;
+
+            TableAttribute? tableAttribute = memberInfo.DeclaringType!.GetCustomAttribute<TableAttribute>(true);
+            if (tableAttribute != null)
+            {
+                tableName = tableAttribute.ToString();
+                TableColumnAttribute? columnAttribute = memberInfo.GetCustomAttribute<TableColumnAttribute>(true);
+                if (columnAttribute != null)
+                {
+                    columnName = columnAttribute.ColumnName;
+                }
+
+                result = true;
+            }
+
+            return result;
+        }
+
 
         /// <summary>
         /// Type mapping dictionary used by <see cref="GetSqlTypeForClrType(Type)"/>
