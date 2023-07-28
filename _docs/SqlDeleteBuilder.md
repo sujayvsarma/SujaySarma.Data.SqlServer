@@ -3,7 +3,7 @@
 This document details the use of the SqlDeleteBuilder statement builder introduced in version 8.8.0.
 
 ---
-This statement builder helps build the DELETE statement. It supports inserting data using a JOIN (DELETE FROM... JOIN...). Let us first look at an example of using the builder. Assume that any objects and properties/fields referenced have been defined elsewhere.
+This statement builder helps build the DELETE statement. It supports deleting data using a JOIN (DELETE FROM... JOIN...). Let us first look at an example of using the builder. Assume that any objects and properties/fields referenced have been defined elsewhere.
 
 ```c#
 SqlDeleteBuilder<UserAccounts>
@@ -17,9 +17,7 @@ SqlDeleteBuilder<UserAccounts>
 
 Let's now look at what we did in more detail:
 
-The builder is static in nature. So calling the `Begin()` method instantiates the builder and kicks off the building sequence -- the table is the one passed into the `T` parameter of `SqlDeleteBuilder`. 
-
-Just like the `SqlQueryBuilder`, we can specify any number of Joins and Where clauses. 
+The builder is static in nature. So calling the `Begin()` method instantiates the builder and kicks off the building sequence -- the table is the one passed into the `T` parameter of `SqlDeleteBuilder`. Just like the `SqlQueryBuilder`, we can specify any number of Joins and Where clauses. 
 
 Now that the builder is complete, there are 3 ways of using it:
 
