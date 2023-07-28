@@ -21,9 +21,9 @@ SqlUpdateWithJoinsBuilder
 
 Let's now look at what we did in more detail:
 
-The builder is static in nature. So calling the `IntoTable()` method instantiates the builder and kicks off the building sequence -- this also selects the table that we are inserting the value into. 
+The builder is static in nature. So calling the `IntoTable()` method instantiates the builder and kicks off the building sequence -- this also selects the table that we are updating the value into. 
 
-Then we add the relevant Joins and Where clause conditions. We may add additional values to the table that are not a part of the business object using the `WithAdditionalColumns` function. This function accepts a `Dictionary<string, object?>`. Values provided to the `WithAdditionalColumns` are NOT re-interpreted, meaning what you have in your code will match exactly the values added to the corresponding `INSERT` statement -- there will be no magic changing `Enums` to `strings` and so on, you will need to do them on your own.
+Then we add the relevant Joins and Where clause conditions. We may add additional values to the table that are not a part of the business object using the `WithAdditionalColumns` function. This function accepts a `Dictionary<string, object?>`. Values provided to the `WithAdditionalColumns` are NOT re-interpreted, meaning what you have in your code will match exactly the values added to the corresponding `UPDATE` statement -- there will be no magic changing `Enums` to `strings` and so on, you will need to do them on your own.
 
 Now that the builder is complete, there are 3 ways of using it:
 
