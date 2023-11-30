@@ -25,7 +25,7 @@
     - SqlUpdateWithJoinsBuilder
     - SqlDeleteBuilder
    
-    details of how to use these are in [this document]([https://github.com/sujayvsarma/SujaySarma.Data.SqlServer/blob/master/FLUID.md](https://github.com/sujayvsarma/SujaySarma.Data.SqlServer/blob/master/_docs/FLUID.md).
+    details of how to use these are in [this document](https://github.com/sujayvsarma/SujaySarma.Data.SqlServer/blob/master/_docs/FLUID.md).
 
 ### Version 8.7.5
 
