@@ -35,7 +35,7 @@ namespace SujaySarma.Data.SqlServer.LinqParsers
         public string ParseToSql(Expression expression, bool treatAssignmentsAsAlias = false)
         {
             _treatAssignmentsAsAlias = treatAssignmentsAsAlias;
-
+            _originalExpression = expression;
             Visit(expression);
 
             StringBuilder sql = new();
@@ -47,6 +47,7 @@ namespace SujaySarma.Data.SqlServer.LinqParsers
 
             return sql.ToString().Trim();
         }
+        private Expression _originalExpression = default!;
 
         /// <summary>
         /// Resolve a conditional expression ((a > b) ? c : d) to a SQL expression (CASE WHEN ELSE)
@@ -137,6 +138,27 @@ namespace SujaySarma.Data.SqlServer.LinqParsers
 
             // normal property access
             string? tid = _typeTableAliasMap.GetAliasOrName(node.Member.DeclaringType);
+            if (string.IsNullOrWhiteSpace(tid))
+            {
+                Type expType = _originalExpression.GetType();
+                if (expType.IsGenericType)
+                {
+                    Type[] expParams = expType.GetGenericArguments();
+                    if ((expParams.Length == 1) && expParams[0].IsGenericType)
+                    {
+                        expParams = expParams[0].GetGenericArguments();
+                    }
+                    foreach(Type ept in expParams)
+                    {
+                        if (node.Member.DeclaringType.IsAssignableFrom(ept))
+                        {
+                            tid = _typeTableAliasMap.GetAliasOrName(ept);
+                            break;
+                        }
+                    }
+                }
+            }
+
             Type propertyOrFieldType = ReflectionUtils.GetFieldOrPropertyType(node.Member);
             bool isEnumProperty = propertyOrFieldType.IsEnum;
 

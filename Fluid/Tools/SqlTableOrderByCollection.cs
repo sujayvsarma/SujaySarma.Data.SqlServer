@@ -20,7 +20,7 @@ namespace SujaySarma.Data.SqlServer.Fluid.Tools
         /// <param name="selector">Selector for parameters of the ORDER BY</param>
         /// <param name="direction">Direction of sorting</param>
         /// <returns>Self-instance</returns>
-        public void Add<TTable, TResult>(Expression<Func<TTable, TResult>> selector, SortOrderEnum direction = SortOrderEnum.ASC)
+        public SqlTableOrderByCollection Add<TTable, TResult>(Expression<Func<TTable, TResult>> selector, SortOrderEnum direction = SortOrderEnum.ASC)
             where TTable : class
         {
             _aliasMapCollection.TryAdd<TTable>();
@@ -32,6 +32,8 @@ namespace SujaySarma.Data.SqlServer.Fluid.Tools
                 _ => "ASC"
             };
             _orderBy.Add($"{orderBy} {dir}");
+
+            return this;
         }
 
         /// <summary>

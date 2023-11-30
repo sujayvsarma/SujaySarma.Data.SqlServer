@@ -34,10 +34,28 @@ namespace SujaySarma.Data.SqlServer.Fluid
                 query.Add($"TOP {_topCount}");
             }
 
-            query.Add(string.Join(',', _selectColumnsList));
-            query.Add("FROM");
-
             TypeTableAliasMap primaryTableMap = base.TypeTableMap.GetPrimaryTable();
+            if (_selectColumnsList.Count == 0)
+            {
+                // We could be here simply because the dev forgot to write .Select<T>() at the end of the fluid loop!
+
+                //NOTE:
+                //  We could do a "*" and avoid the 4 lines of code below. BUT... the class wanting the data 
+                //  may not want all those columns. If the extra columns are calculated, virtual or just heavy, 
+                //  we want to avoid fetching them unnecessarily (DB, network and local system overheads avoided).
+                //  Hence, we will go through all the adorned properties/fields of the Type we are expected to 
+                //  populate and fetch only those columns from the table. Neat, eh?
+
+                // we get the columns from whatever was added in the From() call at the top of the fluid-buildout:
+                foreach (MemberInfo member in primaryTableMap.Discovery.Members)
+                {
+                    TableColumnAttribute columnAttribute = member.GetCustomAttribute<TableColumnAttribute>()!;
+                    AddColumnIfNotExistsOrSkip($"{primaryTableMap.Alias}.[{columnAttribute.ColumnName}]");
+                }
+            }
+            query.Add(string.Join(',', _selectColumnsList));
+
+            query.Add("FROM");            
             query.Add($"{primaryTableMap.GetQualifiedTableName()} {primaryTableMap.Alias} WITH (NOLOCK)");
             foreach (string j in Joins)
             {

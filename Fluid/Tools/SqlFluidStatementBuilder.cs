@@ -21,20 +21,6 @@ namespace SujaySarma.Data.SqlServer.Fluid.Tools
         }
 
         /// <summary>
-        /// SqlTableContext used to execute the generated statement
-        /// </summary>
-        internal SqlTableContext? TableContext
-        {
-            get;
-            init;
-        }
-
-        /// <summary>
-        /// Returns if the TableContext has been set
-        /// </summary>
-        internal bool IsTableContextAvailable => TableContext != null;
-
-        /// <summary>
         /// Build the statement as a SQL
         /// </summary>
         /// <returns>SQL statement string</returns>

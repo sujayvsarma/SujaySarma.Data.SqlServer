@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Json;
 
@@ -355,7 +354,6 @@ namespace SujaySarma.Data.SqlServer.Reflection
             return instance;
         }
 
-
         /// <summary>
         /// Populate an object
         /// </summary>
@@ -364,6 +362,9 @@ namespace SujaySarma.Data.SqlServer.Reflection
         /// <returns>Instance of <paramref name="TObject"/></returns>
         public static object Populate(Type TObject, DataRow row)
         {
+            // THIS API is not used internally by SqlHelper, but is left open for consumer-code to leverage the helper's 
+            // powerful ORM features to hydrate CLR objects from SQL datarows.
+
             if ((row.Table == default) || (row.Table.Columns.Count == 0))
             {
                 throw new TypeLoadException($"The DataRow passed is not attached to a table, or the table has no schema. Object: '{TObject.Name}'");
@@ -394,7 +395,6 @@ namespace SujaySarma.Data.SqlServer.Reflection
 
             return instance;
         }
-
 
         /// <summary>
         /// Get the underlying CLR data type of the property or field
@@ -430,36 +430,6 @@ namespace SujaySarma.Data.SqlServer.Reflection
 
             return "nvarchar";  // when all else fails
         }
-
-        /// <summary>
-        /// Try and get the table and column name of the property/field
-        /// </summary>
-        /// <param name="memberInfo">Property or Field information</param>
-        /// <param name="tableName">[Out] Name of the table this column belongs in</param>
-        /// <param name="columnName">[Out] Name of the column corresponding to this <paramref name="memberInfo"/></param>
-        /// <returns>True if we retrieved the information.</returns>
-        public static bool TryGetTableAndColumnName(MemberInfo memberInfo, [NotNullWhen(true)] out string? tableName, [NotNullWhen(true)] out string? columnName)
-        {
-            bool result = false;
-            tableName = null;
-            columnName = null;
-
-            TableAttribute? tableAttribute = memberInfo.DeclaringType!.GetCustomAttribute<TableAttribute>(true);
-            if (tableAttribute != null)
-            {
-                tableName = tableAttribute.ToString();
-                TableColumnAttribute? columnAttribute = memberInfo.GetCustomAttribute<TableColumnAttribute>(true);
-                if (columnAttribute != null)
-                {
-                    columnName = columnAttribute.ColumnName;
-                }
-
-                result = true;
-            }
-
-            return result;
-        }
-
 
         /// <summary>
         /// Type mapping dictionary used by <see cref="GetSqlTypeForClrType(Type)"/>

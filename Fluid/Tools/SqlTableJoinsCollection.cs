@@ -22,7 +22,7 @@ namespace SujaySarma.Data.SqlServer.Fluid.Tools
         /// <param name="condition">Fully formed condition (ON clause) to join the tables. This is neither checked nor parsed</param>
         /// <param name="joinType">The type of join to perform.</param>
         /// <returns>Self-instance</returns>
-        public void Add(string tableName, string condition, TypesOfJoinsEnum joinType = TypesOfJoinsEnum.Inner)
+        public SqlTableJoinsCollection Add(string tableName, string condition, TypesOfJoinsEnum joinType = TypesOfJoinsEnum.Inner)
         {
             string joinTypeString = joinType switch
             {
@@ -34,6 +34,8 @@ namespace SujaySarma.Data.SqlServer.Fluid.Tools
 
             string tableAlias = _aliasMapCollection.GetAliasIfDefined(tableName) ?? $"j{_joinStatements.Count}";
             _joinStatements.Add($"{joinTypeString} [{tableName}] {tableAlias} WITH (NOLOCK) ON {condition}");
+
+            return this;
         }
 
         /// <summary>
@@ -44,7 +46,7 @@ namespace SujaySarma.Data.SqlServer.Fluid.Tools
         /// <param name="onCondition">Condition to join the tables</param>
         /// <param name="joinType">The type of join to perform. Default: INNER JOIN</param>
         /// <returns>Self-instance</returns>
-        public void Add<TLeft, TRight>(Expression<Func<TLeft, TRight, bool>> onCondition, TypesOfJoinsEnum joinType = TypesOfJoinsEnum.Inner)
+        public SqlTableJoinsCollection Add<TLeft, TRight>(Expression<Func<TLeft, TRight, bool>> onCondition, TypesOfJoinsEnum joinType = TypesOfJoinsEnum.Inner)
             where TLeft : class
             where TRight : class
         {
@@ -68,6 +70,8 @@ namespace SujaySarma.Data.SqlServer.Fluid.Tools
             };
 
             _joinStatements.Add($"{joinTypeString} [{rightTable.Discovery.TableName}] {rightTable.Alias} WITH (NOLOCK) ON {onConditionSql}");
+
+            return this;
         }
 
         /// <summary>

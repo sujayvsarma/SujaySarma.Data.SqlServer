@@ -3,7 +3,16 @@
 
 *This document captures all changes made to this library since it's initial release.*
 
-### Version 8.8.0 (Latest!)
+### Version 8.8.5 (Latest!)
+
+- Fixes a few bugs. 
+    - Query builders will now correctly pick up table and column specifications when they are class-inherited instead of being directly on the operated object.
+
+- Allows chaning `Join`, `Where` and `OrderBy` clauses (eg: `qb.Where.Add().Add().Add()`). Earlier, each `Add()` would need to be a fresh statement.
+
+- It is no longer necessary to include a call to `qb.Select<T>()` only to add columns to the generated `SELECT` query. If the `Select<T>()` call is not performed, `Build()` will automatically add all columns from the object/table specified in the initial `From<T>()` call.
+ 
+### Version 8.8.0
 
 - Adds Lambda Expression support. Use this with the Fluid style statement builders.
 

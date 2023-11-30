@@ -21,11 +21,14 @@ namespace SujaySarma.Data.SqlServer.Fluid.Tools
         /// <param name="conditions">One or more conditions in Lambda Expression form</param>
         /// <param name="conditionAppendingOperator">Operator to append the current set of conditions to the ones already added</param>
         /// <returns>Self-instance</returns>
-        public void Add<TTable1>(Expression<Func<TTable1, bool>> conditions, ConditionalClauseOperatorTypesEnum conditionAppendingOperator = ConditionalClauseOperatorTypesEnum.And)
+        public SqlTableWhereConditionsCollection Add<TTable1>(Expression<Func<TTable1, bool>> conditions, ConditionalClauseOperatorTypesEnum conditionAppendingOperator = ConditionalClauseOperatorTypesEnum.And)
             where TTable1 : class
         {
             _aliasMapCollection.TryAdd<TTable1>();
+
+            
             AddImpl(conditions, conditionAppendingOperator);
+            return this;
         }
 
         /// <summary>
@@ -36,13 +39,16 @@ namespace SujaySarma.Data.SqlServer.Fluid.Tools
         /// <param name="conditions">One or more conditions in Lambda Expression form</param>
         /// <param name="conditionAppendingOperator">Operator to append the current set of conditions to the ones already added</param>
         /// <returns>Self-instance</returns>
-        public void Add<TTable1, TTable2>(Expression<Func<TTable1, TTable2, bool>> conditions, ConditionalClauseOperatorTypesEnum conditionAppendingOperator = ConditionalClauseOperatorTypesEnum.And)
+        public SqlTableWhereConditionsCollection Add<TTable1, TTable2>(Expression<Func<TTable1, TTable2, bool>> conditions, ConditionalClauseOperatorTypesEnum conditionAppendingOperator = ConditionalClauseOperatorTypesEnum.And)
             where TTable1 : class
             where TTable2 : class
         {
             _aliasMapCollection.TryAdd<TTable1>();
             _aliasMapCollection.TryAdd<TTable2>();
+
             AddImpl(conditions, conditionAppendingOperator);
+
+            return this;
         }
 
 
@@ -73,6 +79,7 @@ namespace SujaySarma.Data.SqlServer.Fluid.Tools
                         }
                     );
             }
+
             _whereConditions.Append(parser.ParseToSql(condition));
         }
 

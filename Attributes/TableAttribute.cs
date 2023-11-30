@@ -3,9 +3,10 @@
 namespace SujaySarma.Data.SqlServer.Attributes
 {
     /// <summary>
-    /// Provide name of the table the data for the class is stored in.
+    /// Provide name of the table the data for the class is stored in. This attribute cannot be anotated on an 
+    /// interface as interface-attributes are NOT inherited via class-inheritance.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
     public class TableAttribute : Attribute
     {
 
