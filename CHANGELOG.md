@@ -3,7 +3,27 @@
 
 *This document captures all changes made to this library since it's initial release.*
 
-### Version 8.8.5 (Latest!)
+### Version 8.9.0 (Latest!)
+
+- Adds two methods to SqlTableContext: `EnableDebugging()` and `DisableDebugging()`. Simply call this on your instance of `SqlTableContext` to enable/disable T-SQL dumping to console/logs. The functions are available in both DEBUG and RELEASE versions. However, SQL-dumps will be output only in DEBUG mode.
+
+    Example:
+    ```
+    SqlTableContext tableContext = new();
+    tableContext.EnableDebugging();
+    //... do something ...
+    tableContext.DisableDebugging();
+    ```
+
+- Fixes a bug in SqlTableContext's InsertAsync, UpdateAsync and DeleteAsync operations where passing an empty structure still causes a connection to be set up. Now, we detect the empty structure early and exit the operation with a Zero (0) return.
+
+- Fixes expression parsing bugs:
+
+     - Expressions like `== null` and `<> null` are correctly parsed to `IS NULL` and `IS NOT NULL`.
+     
+     - Linq method `Contains()` will now correctly parse to a T-SQL `IN` operation.
+
+### Version 8.8.5
 
 - Fixes a few bugs. 
     - Query builders will now correctly pick up table and column specifications when they are class-inherited instead of being directly on the operated object.

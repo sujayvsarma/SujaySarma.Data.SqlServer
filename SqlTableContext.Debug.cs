@@ -7,7 +7,6 @@ namespace SujaySarma.Data.SqlServer
     /// </summary>
     public partial class SqlTableContext
     {
-#if DEBUG
         
         /// <summary>
         /// Dump the sql to console if enabled
@@ -15,10 +14,12 @@ namespace SujaySarma.Data.SqlServer
         /// <param name="sql">SQL to dump</param>
         private static void DumpGeneratedSqlToConsole(string sql)
         {
+#if DEBUG
             if (Environment.GetEnvironmentVariable(DUMP_SQL_FLAG) != null)
             {
                 Console.WriteLine(sql);
             }
+#endif
         }
 
         /// <summary>
@@ -26,15 +27,5 @@ namespace SujaySarma.Data.SqlServer
         /// </summary>
         public const string DUMP_SQL_FLAG = "SQLTABLECONTEXT_DUMPSQL";
 
-#else
-
-        /// <summary>
-        /// In release mode, this is a NO-OP function
-        /// </summary>
-#pragma warning disable IDE0060 // Remove unused parameter
-        private static void DumpGeneratedSqlToConsole(string sql) { }
-#pragma warning restore IDE0060 // Remove unused parameter
-
-#endif
     }
 }

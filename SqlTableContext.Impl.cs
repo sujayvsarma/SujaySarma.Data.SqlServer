@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 
 using Microsoft.Data.SqlClient;
@@ -250,30 +251,33 @@ namespace SujaySarma.Data.SqlServer
         {
             int rowsAffected = 0;
 
-            using (SqlConnection cn = new(_connectionString))
+            if (data.Any()) // bug fix: callers may pass empty structures to insert/update/delete
             {
-                cn.Open();
-
-                using SqlCommand cmd = cn.CreateCommand();
-                cmd.CommandType = CommandType.Text;
-
-                foreach (T item in data)
+                using (SqlConnection cn = new(_connectionString))
                 {
-                    cmd.CommandText = operationType switch
+                    cn.Open();
+
+                    using SqlCommand cmd = cn.CreateCommand();
+                    cmd.CommandType = CommandType.Text;
+
+                    foreach (T item in data)
                     {
-                        SqlStatementType.Insert => SQLScriptGenerator.GetInsertStatement<T>(item, AdditionalData),
-                        SqlStatementType.Update => SQLScriptGenerator.GetUpdateStatement<T>(item, AdditionalData, AdditionalConditions),
-                        SqlStatementType.Delete => SQLScriptGenerator.GetDeleteStatement<T>(item, AdditionalConditions),
-                        
-                        // to complicated to support Addl data & conditions with our current code!
-                        SqlStatementType.Upsert => SQLScriptGenerator.GetMergeStatement<T>(item),
+                        cmd.CommandText = operationType switch
+                        {
+                            SqlStatementType.Insert => SQLScriptGenerator.GetInsertStatement<T>(item, AdditionalData),
+                            SqlStatementType.Update => SQLScriptGenerator.GetUpdateStatement<T>(item, AdditionalData, AdditionalConditions),
+                            SqlStatementType.Delete => SQLScriptGenerator.GetDeleteStatement<T>(item, AdditionalConditions),
 
-                        _ => throw new NotSupportedException($"'{nameof(operationType)}' must be INSERT, UPDATE or DELETE.")
-                    };
+                            // to complicated to support Addl data & conditions with our current code!
+                            SqlStatementType.Upsert => SQLScriptGenerator.GetMergeStatement<T>(item),
 
-                    DumpGeneratedSqlToConsole(cmd.CommandText);
+                            _ => throw new NotSupportedException($"'{nameof(operationType)}' must be INSERT, UPDATE or DELETE.")
+                        };
 
-                    rowsAffected += await cmd.ExecuteNonQueryAsync();
+                        DumpGeneratedSqlToConsole(cmd.CommandText);
+
+                        rowsAffected += await cmd.ExecuteNonQueryAsync();
+                    }
                 }
             }
 

@@ -80,7 +80,12 @@ namespace SujaySarma.Data.SqlServer.Fluid.Tools
                     );
             }
 
-            _whereConditions.Append(parser.ParseToSql(condition));
+            string sql = parser.ParseToSql(condition);
+            if (!sql.StartsWith('('))
+            {
+                sql = $"({sql})";
+            }
+            _whereConditions.Append(sql);
         }
 
 

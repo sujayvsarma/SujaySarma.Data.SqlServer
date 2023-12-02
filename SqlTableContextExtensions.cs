@@ -142,5 +142,16 @@ namespace SujaySarma.Data.SqlServer
             => await tableContext.ExecuteNonQueryAsync(deleteBuilder.Build());
 
 
+        /// <summary>
+        /// Enables dumping of SQL statements to the console/log
+        /// </summary>
+        public static void EnableDebugging(this SqlTableContext _) => Environment.SetEnvironmentVariable(SqlTableContext.DUMP_SQL_FLAG, "true");
+
+        /// <summary>
+        /// Disables dumping of SQL statements to the console/log
+        /// </summary>
+        /// <param name="_"></param>
+        public static void DisableDebugging(this SqlTableContext _) => Environment.SetEnvironmentVariable(SqlTableContext.DUMP_SQL_FLAG, null);
+
     }
 }

@@ -81,6 +81,18 @@ namespace SujaySarma.Data.SqlServer.LinqParsers
             Visit(node.Right);
             string rightOperandSql = _values.Pop();
 
+            if (rightOperandSql == "NULL")
+            {
+                if (@operator == "==")
+                {
+                    @operator = "IS";
+                }
+                else
+                {
+                    @operator = "IS NOT";
+                }
+            }
+
             _values.Push($"({leftOperandSql} {@operator} {rightOperandSql})");
 
             return node;
@@ -235,6 +247,34 @@ namespace SujaySarma.Data.SqlServer.LinqParsers
         }
 
         /// <summary>
+        /// Get the right SQL operator for selected method calls. Other methods are processed as normally 
+        /// (and often erroneously) by the system
+        /// </summary>
+        protected override Expression VisitMethodCall(MethodCallExpression node)
+        {
+            RecognisedMethodCallsEnum recognisedCallType = RecognisedMethodCallsEnum.Unknown;
+            if (node.Method.Name.Equals("Contains"))
+            {
+                recognisedCallType = RecognisedMethodCallsEnum.Contains;
+            }
+
+            Expression processResult = base.VisitMethodCall(node);
+            switch (recognisedCallType)
+            {
+                case RecognisedMethodCallsEnum.Contains:
+                    // Stack order is           : <list> <variable>
+                    // We need to change it to  : <variable> CONTAINS <list>
+
+                    string fixedOrder = $"{_values.Pop()} IN ({_values.Pop()})";
+                    _values.Push(fixedOrder);
+                    
+                    break;
+            }
+            
+            return processResult;
+        }
+
+        /// <summary>
         /// Get the SQL operator for the type of node
         /// </summary>
         /// <param name="node">Node</param>
@@ -299,7 +339,12 @@ namespace SujaySarma.Data.SqlServer.LinqParsers
             return result;
         }
 
-
+        /// <summary>
+        /// Get a value from a given object member that could be a property or a field
+        /// </summary>
+        /// <param name="propertyOrFieldInfo">The object-member (a property or a field)</param>
+        /// <param name="parentInstance">Instance of object. NULL for static references</param>
+        /// <returns>Raw value from object</returns>
         private static object? GetValueFromPropertyOrField(MemberInfo propertyOrFieldInfo, object? parentInstance)
             => propertyOrFieldInfo.MemberType switch
             {
@@ -309,7 +354,11 @@ namespace SujaySarma.Data.SqlServer.LinqParsers
                 _ => throw new InvalidOperationException($"Unsupported operation: Cannot get value from member of type '{propertyOrFieldInfo.MemberType}'")
             };
 
-
+        /// <summary>
+        /// Serialise the given value to a string. The string returned will be T-SQL compatible.
+        /// </summary>
+        /// <param name="value">Value to serialise</param>
+        /// <returns>String compatible with T-SQL</returns>
         private string SerializeToString(object? value)
         {
             string result;
@@ -338,6 +387,22 @@ namespace SujaySarma.Data.SqlServer.LinqParsers
         private readonly TypeTableAliasMapCollection _typeTableAliasMap;
         private bool _treatAssignmentsAsAlias = false;
 
+        /// <summary>
+        /// The methods that we recognise and know what to do with when 
+        /// handling the VisitMethodCall visitor.
+        /// </summary>
+        private enum RecognisedMethodCallsEnum
+        {
+            /// <summary>
+            /// Unknown
+            /// </summary>
+            Unknown = 0,
 
+
+            /// <summary>
+            /// Linq Contains() translates to T-SQL "A IN [LIST]"
+            /// </summary>
+            Contains
+        }
     }
 }

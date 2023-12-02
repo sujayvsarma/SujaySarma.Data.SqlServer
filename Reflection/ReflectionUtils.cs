@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -201,6 +202,16 @@ namespace SujaySarma.Data.SqlServer.Reflection
             if (clrValue is Guid v4)
             {
                 return (quotedStrings ? $"'{v4:d}'" : $"{v4:d}");
+            }
+
+            if ((clrValue is IEnumerable e) && (!serializeToJson))
+            {
+                List<string> strings = new();
+                foreach(object element in e)
+                {
+                    strings.Add(GetSQLStringValue(element));
+                }
+                return string.Join(",", strings);
             }
 
             if (serializeToJson)
