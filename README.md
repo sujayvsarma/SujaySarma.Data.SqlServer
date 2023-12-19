@@ -5,7 +5,7 @@
 
 Library                      | Current version
 -----------------------------|------------------
-SujaySarma.Data.SqlServer    | Version 8.8.5
+SujaySarma.Data.SqlServer    | Version 8.9.6
 
 ## NuGet Package
 https://www.nuget.org/packages/SujaySarma.Data.SqlServer
@@ -17,7 +17,9 @@ https://github.com/sujayvsarma/SujaySarma.Data.SqlServer
 
 Version | Changes
 --------|----------
-8.5.5 | Bug fixes, small performance enhancements
+8.9.6 | Adds support for .NET 6.0+
+8.9.0 | Bug fixes, Adds `Enable|DisableDebugging()`
+8.8.5 | Bug fixes, chain Join/Where/OrderBy statements, removes need for `qb.Select<T>()`
 8.8.0 | Fluid builders, support for Lambda expressions
 8.7.5 | Nullability bug fix in `ExecuteScalarAsync()`.
 8.7.0 | SQL Injection mitigation for `Select()` methods.

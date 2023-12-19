@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
@@ -19,8 +19,9 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageTags>sql,sql server,sqlserver,azure sql,sql linux,mssql,mssqlserver,localdb,sqlexpress,sujay,sujaysarma,sujay sarma</PackageTags>
 		<PackageReleaseNotes>
+			v 8.9.6	  - Adds support for .NET 6.0+
 			v 8.9.0	  - Some enhancements and bug fixes
-			v 8.5.5   - Bug fixes, small performance enhancements
+			v 8.8.5   - Bug fixes, small performance enhancements
 			v 8.8.0   - New fluid-style query builders, support for lambda expressions
 			v 8.7.5   - Null bug fix in ExecuteScalarAsync.
 			v 8.7.0	  - SQL Injection mitigation for various SELECT methods.
@@ -28,9 +29,9 @@
 			v 8.2.0   - Adds Stored Procedure execution, performance improvements, bug fixes.
 			v 8.0.0   - This is the initial version of the SQL Server client operations package.
 		</PackageReleaseNotes>
-		<Version>8.9.0</Version>
-		<AssemblyVersion>8.9.0.0</AssemblyVersion>
-		<FileVersion>8.9.0.0</FileVersion>
+		<Version>8.9.6</Version>
+		<AssemblyVersion>8.9.6.0</AssemblyVersion>
+		<FileVersion>8.9.6.0</FileVersion>
 		<Authors>Sujay V. Sarma</Authors>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<Title>Sujay Sarma's SQL Server Client SDK (SQL Server, SQL Express, LocalDB, SQL Azure, SQL Server on Linux compatible)</Title>
@@ -61,11 +62,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="logo.png">
+	  <None Include="logo.png">
 	    <Pack>True</Pack>
 	    <PackagePath>\</PackagePath>
 	  </None>
-	  <None Update="README.md">
+	  <None Include="README.md">
 	    <Pack>True</Pack>
 	    <PackagePath>\</PackagePath>
 	  </None>

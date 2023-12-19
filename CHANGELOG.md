@@ -3,7 +3,12 @@
 
 *This document captures all changes made to this library since it's initial release.*
 
-### Version 8.9.0 (Latest!)
+### Version 8.9.6 (Latest!)
+
+- Adds support to .NET 6.0+
+
+
+### Version 8.9.0
 
 - Adds two methods to SqlTableContext: `EnableDebugging()` and `DisableDebugging()`. Simply call this on your instance of `SqlTableContext` to enable/disable T-SQL dumping to console/logs. The functions are available in both DEBUG and RELEASE versions. However, SQL-dumps will be output only in DEBUG mode.
 
