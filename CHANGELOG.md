@@ -3,7 +3,12 @@
 
 *This document captures all changes made to this library since it's initial release.*
 
-### Version 8.9.6 (Latest!)
+### Version 8.9.7 (Latest!)
+
+- Addresses a security vulnerability in Microsoft.Data.SqlClient v5.1.2 that was used till the previous version of this library. To mitigate, we have a simple update to the latest (5.1.5) version of the Microsoft library.
+(There are no other changes in this version!) 
+
+### Version 8.9.6
 
 - Adds support to .NET 6.0+
 

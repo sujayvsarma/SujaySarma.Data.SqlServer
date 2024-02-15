@@ -5,7 +5,7 @@
 
 Library                      | Current version
 -----------------------------|------------------
-SujaySarma.Data.SqlServer    | Version 8.9.6
+SujaySarma.Data.SqlServer    | Version 8.9.7
 
 ## NuGet Package
 https://www.nuget.org/packages/SujaySarma.Data.SqlServer
@@ -17,6 +17,7 @@ https://github.com/sujayvsarma/SujaySarma.Data.SqlServer
 
 Version | Changes
 --------|----------
+8.9.7 | Addresses security vulnerability in Microsoft.Data.SqlClient
 8.9.6 | Adds support for .NET 6.0+
 8.9.0 | Bug fixes, Adds `Enable|DisableDebugging()`
 8.8.5 | Bug fixes, chain Join/Where/OrderBy statements, removes need for `qb.Select<T>()`
